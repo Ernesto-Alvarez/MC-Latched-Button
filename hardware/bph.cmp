@@ -1,0 +1,115 @@
+Cmp-Mod V01 Created by CvPCB (2011-05-25)-stable date = Mon 04 Apr 2016 18:20:37 ART
+
+BeginCmp
+TimeStamp = /56F8533A;
+Reference = C1;
+ValeurCmp = 0.1uF;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /56F86C88;
+Reference = C2;
+ValeurCmp = 33uF;
+IdModule  = EC80;
+EndCmp
+
+BeginCmp
+TimeStamp = /5702D7EF;
+Reference = C3;
+ValeurCmp = 1uF;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /56F5F2CD;
+Reference = D1;
+ValeurCmp = LED;
+IdModule  = ;
+EndCmp
+
+BeginCmp
+TimeStamp = /56F5EED1;
+Reference = D2;
+ValeurCmp = LED;
+IdModule  = ;
+EndCmp
+
+BeginCmp
+TimeStamp = /56F5EC24;
+Reference = D3;
+ValeurCmp = DIODE;
+IdModule  = DO-41;
+EndCmp
+
+BeginCmp
+TimeStamp = /56F56838;
+Reference = K1;
+ValeurCmp = RELAY_SPDT;
+IdModule  = RELAY_SPDT;
+EndCmp
+
+BeginCmp
+TimeStamp = /5702D891;
+Reference = P1;
+ValeurCmp = PGM_CONN;
+IdModule  = ;
+EndCmp
+
+BeginCmp
+TimeStamp = /5702D85F;
+Reference = P2;
+ValeurCmp = PWR_CONN;
+IdModule  = CONN2_175;
+EndCmp
+
+BeginCmp
+TimeStamp = /56F5F3EE;
+Reference = P3;
+ValeurCmp = BUTTON;
+IdModule  = CONN2_175;
+EndCmp
+
+BeginCmp
+TimeStamp = /56F5EDB4;
+Reference = P4;
+ValeurCmp = TERMINAL;
+IdModule  = CONN2_175;
+EndCmp
+
+BeginCmp
+TimeStamp = /56F5EC71;
+Reference = Q1;
+ValeurCmp = BC337;
+IdModule  = ;
+EndCmp
+
+BeginCmp
+TimeStamp = /56F5F2C3;
+Reference = R1;
+ValeurCmp = 330;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /56F5F1F8;
+Reference = R2;
+ValeurCmp = 330;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /56F5F33E;
+Reference = R3;
+ValeurCmp = R;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /56F56454;
+Reference = U1;
+ValeurCmp = PIC12F629;
+IdModule  = DIP-8;
+EndCmp
+
+EndListe

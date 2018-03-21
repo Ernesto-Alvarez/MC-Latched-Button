@@ -1,0 +1,509 @@
+EESchema Schematic File Version 2
+LIBS:bph-rescue
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:7-seg-display
+LIBS:microphone
+LIBS:speaker-module
+LIBS:tanque
+LIBS:bph-cache
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date "4 apr 2016"
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L PWR_FLAG #FLG01
+U 1 1 5702D8D2
+P 3300 3500
+F 0 "#FLG01" H 3300 3770 30  0001 C CNN
+F 1 "PWR_FLAG" H 3300 3730 30  0000 C CNN
+F 2 "" H 3300 3500 60  0001 C CNN
+F 3 "" H 3300 3500 60  0001 C CNN
+	1    3300 3500
+	-1   0    0    1   
+$EndComp
+$Comp
+L PWR_FLAG #FLG02
+U 1 1 5702D8CA
+P 3300 3400
+F 0 "#FLG02" H 3300 3670 30  0001 C CNN
+F 1 "PWR_FLAG" H 3300 3630 30  0000 C CNN
+F 2 "" H 3300 3400 60  0001 C CNN
+F 3 "" H 3300 3400 60  0001 C CNN
+	1    3300 3400
+	1    0    0    -1  
+$EndComp
+Text Label 2900 3500 0    60   ~ 0
+GND
+Text Label 2900 3400 0    60   ~ 0
+VCC
+$Comp
+L CONN_01X05 P1
+U 1 1 5702D891
+P 2050 3550
+F 0 "P1" H 2050 3850 50  0000 C CNN
+F 1 "PGM_UART" V 2150 3550 50  0000 C CNN
+F 2 "1mm-process:SIL-5" H 2050 3550 60  0001 C CNN
+F 3 "" H 2050 3550 60  0001 C CNN
+	1    2050 3550
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_01X02 P3
+U 1 1 5702D85F
+P 3950 3450
+F 0 "P3" H 3950 3600 40  0000 C CNN
+F 1 "PWR_PIN" V 4050 3450 40  0000 C CNN
+F 2 "1mm-process:SIL-2" H 3950 3450 60  0001 C CNN
+F 3 "" H 3950 3450 60  0001 C CNN
+	1    3950 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C3
+U 1 1 5702D7EF
+P 7900 1700
+F 0 "C3" H 7950 1800 50  0000 L CNN
+F 1 "1uF" H 7950 1600 50  0000 L CNN
+F 2 "1mm-process:SM0805" H 7900 1700 60  0001 C CNN
+F 3 "" H 7900 1700 60  0001 C CNN
+	1    7900 1700
+	1    0    0    -1  
+$EndComp
+Text Notes 4600 2900 0    60   ~ 0
+Relay
+$Comp
+L CP C2
+U 1 1 56F86C88
+P 7600 1700
+F 0 "C2" H 7650 1800 50  0000 L CNN
+F 1 "33uF" H 7650 1600 50  0000 L CNN
+F 2 "1mm-process:EC50" H 7600 1700 60  0001 C CNN
+F 3 "" H 7600 1700 60  0001 C CNN
+	1    7600 1700
+	1    0    0    -1  
+$EndComp
+Text Label 6900 2200 1    60   ~ 0
+HV_TERM_B
+Text Label 6900 1500 1    60   ~ 0
+HV_TERM_A
+Text Label 4800 2400 0    60   ~ 0
+RELAY_CTL
+NoConn ~ 6650 2100
+Text Notes 600  2900 0    60   ~ 0
+Microcontroller
+Text Notes 1800 2700 0    60   ~ 0
+Weak pull-up activated on pins 5 and 6
+Text Label 1400 2350 0    60   ~ 0
+VPP
+$Comp
+L C C1
+U 1 1 56F8533A
+P 2900 650
+F 0 "C1" H 2950 750 50  0000 L CNN
+F 1 "0.1uF" H 2950 550 50  0000 L CNN
+F 2 "1mm-process:SM0805" H 2900 650 60  0001 C CNN
+F 3 "" H 2900 650 60  0001 C CNN
+	1    2900 650 
+	0    1    1    0   
+$EndComp
+Text Label 4000 2050 2    60   ~ 0
+PGC/RXD
+Text Label 4000 1650 2    60   ~ 0
+PGD/TXD
+$Comp
+L GND-RESCUE-bph #PWR03
+U 1 1 56F5F407
+P 3900 2800
+F 0 "#PWR03" H 3900 2800 30  0001 C CNN
+F 1 "GND" H 3900 2730 30  0001 C CNN
+F 2 "" H 3900 2800 60  0001 C CNN
+F 3 "" H 3900 2800 60  0001 C CNN
+	1    3900 2800
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_01X02 P5
+U 1 1 56F5F3EE
+P 4100 2450
+F 0 "P5" H 4100 2600 40  0000 C CNN
+F 1 "BUTTON" V 4200 2450 40  0000 C CNN
+F 2 "1mm-process:SIL-2" H 4100 2450 60  0001 C CNN
+F 3 "" H 4100 2450 60  0001 C CNN
+	1    4100 2450
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R3
+U 1 1 56F5F33E
+P 5550 2400
+F 0 "R3" V 5630 2400 50  0000 C CNN
+F 1 "R" V 5550 2400 50  0000 C CNN
+F 2 "1mm-process:SM0805" H 5550 2400 60  0001 C CNN
+F 3 "" H 5550 2400 60  0001 C CNN
+	1    5550 2400
+	0    1    1    0   
+$EndComp
+$Comp
+L GND #PWR04
+U 1 1 56F5F307
+P 800 1800
+F 0 "#PWR04" H 800 1800 30  0001 C CNN
+F 1 "GND" H 800 1730 30  0001 C CNN
+F 2 "" H 800 1800 60  0001 C CNN
+F 3 "" H 800 1800 60  0001 C CNN
+	1    800  1800
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D1
+U 1 1 56F5F2CD
+P 1000 1650
+F 0 "D1" H 1000 1750 50  0000 C CNN
+F 1 "LED" H 1000 1550 50  0000 C CNN
+F 2 "1mm-process:LED-5mm" H 1000 1650 60  0001 C CNN
+F 3 "" H 1000 1650 60  0001 C CNN
+	1    1000 1650
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R1
+U 1 1 56F5F2C3
+P 1650 1650
+F 0 "R1" V 1730 1650 50  0000 C CNN
+F 1 "330" V 1650 1650 50  0000 C CNN
+F 2 "1mm-process:SM0805" H 1650 1650 60  0001 C CNN
+F 3 "" H 1650 1650 60  0001 C CNN
+	1    1650 1650
+	0    1    1    0   
+$EndComp
+Text Label 800  1500 0    60   ~ 0
+RELAY_CTL
+$Comp
+L GND #PWR05
+U 1 1 56F5F222
+P 800 2200
+F 0 "#PWR05" H 800 2200 30  0001 C CNN
+F 1 "GND" H 800 2130 30  0001 C CNN
+F 2 "" H 800 2200 60  0001 C CNN
+F 3 "" H 800 2200 60  0001 C CNN
+	1    800  2200
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R2
+U 1 1 56F5F1F8
+P 1650 2050
+F 0 "R2" V 1730 2050 50  0000 C CNN
+F 1 "330" V 1650 2050 50  0000 C CNN
+F 2 "1mm-process:SM0805" H 1650 2050 60  0001 C CNN
+F 3 "" H 1650 2050 60  0001 C CNN
+	1    1650 2050
+	0    1    1    0   
+$EndComp
+$Comp
+L LED D2
+U 1 1 56F5EED1
+P 1000 2050
+F 0 "D2" H 1000 2150 50  0000 C CNN
+F 1 "LED" H 1000 1950 50  0000 C CNN
+F 2 "1mm-process:LED-5mm" H 1000 2050 60  0001 C CNN
+F 3 "" H 1000 2050 60  0001 C CNN
+	1    1000 2050
+	1    0    0    -1  
+$EndComp
+$Comp
+L VCC #PWR06
+U 1 1 56F5EE0A
+P 6200 750
+F 0 "#PWR06" H 6200 850 30  0001 C CNN
+F 1 "VCC" H 6200 850 30  0000 C CNN
+F 2 "" H 6200 750 60  0001 C CNN
+F 3 "" H 6200 750 60  0001 C CNN
+	1    6200 750 
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_01X02 P6
+U 1 1 56F5EDB4
+P 7100 1600
+F 0 "P6" H 7100 1750 40  0000 C CNN
+F 1 "HV_TERMINAL" V 7200 1600 40  0000 C CNN
+F 2 "1mm-process:CONN2_175" H 7100 1600 60  0001 C CNN
+F 3 "" H 7100 1600 60  0001 C CNN
+	1    7100 1600
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR07
+U 1 1 56F5ECAC
+P 6200 2700
+F 0 "#PWR07" H 6200 2700 30  0001 C CNN
+F 1 "GND" H 6200 2630 30  0001 C CNN
+F 2 "" H 6200 2700 60  0001 C CNN
+F 3 "" H 6200 2700 60  0001 C CNN
+	1    6200 2700
+	1    0    0    -1  
+$EndComp
+$Comp
+L Q_NPN_CBE Q1
+U 1 1 56F5EC71
+P 6100 2400
+F 0 "Q1" H 6100 2250 50  0000 R CNN
+F 1 "BC337" H 6100 2550 50  0000 R CNN
+F 2 "1mm-process:TO-92" H 6100 2400 60  0001 C CNN
+F 3 "" H 6100 2400 60  0001 C CNN
+	1    6100 2400
+	1    0    0    -1  
+$EndComp
+$Comp
+L D D3
+U 1 1 56F5EC24
+P 5900 1600
+F 0 "D3" H 5900 1700 40  0000 C CNN
+F 1 "DIODE" H 5900 1500 40  0000 C CNN
+F 2 "1mm-process:DO-41" H 5900 1600 60  0001 C CNN
+F 3 "" H 5900 1600 60  0001 C CNN
+	1    5900 1600
+	0    1    1    0   
+$EndComp
+$Comp
+L RELAY_SPDT K1
+U 1 1 56F56838
+P 6300 1600
+F 0 "K1" H 6100 2000 60  0000 C CNN
+F 1 "RELAY_SPDT" H 6300 1600 60  0000 C CNN
+F 2 "1mm-process:RELAY_SPDT" H 6300 1600 60  0001 C CNN
+F 3 "" H 6300 1600 60  0001 C CNN
+	1    6300 1600
+	0    1    1    0   
+$EndComp
+$Comp
+L VCC #PWR08
+U 1 1 56F56515
+P 1850 1300
+F 0 "#PWR08" H 1850 1400 30  0001 C CNN
+F 1 "VCC" H 1850 1400 30  0000 C CNN
+F 2 "" H 1850 1300 60  0001 C CNN
+F 3 "" H 1850 1300 60  0001 C CNN
+	1    1850 1300
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR09
+U 1 1 56F564F9
+P 3900 1400
+F 0 "#PWR09" H 3900 1400 30  0001 C CNN
+F 1 "GND" H 3900 1330 30  0001 C CNN
+F 2 "" H 3900 1400 60  0001 C CNN
+F 3 "" H 3900 1400 60  0001 C CNN
+	1    3900 1400
+	1    0    0    -1  
+$EndComp
+$Comp
+L PIC12F629-RESCUE-bph U1
+U 1 1 56F56454
+P 2900 1850
+F 0 "U1" H 2850 1850 60  0000 C CNN
+F 1 "PIC12F629" H 2900 2600 60  0000 C CNN
+F 2 "1mm-process:DIP-8" H 2900 1850 60  0001 C CNN
+F 3 "" H 2900 1850 60  0001 C CNN
+	1    2900 1850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1200 3650 1850 3650
+Wire Wire Line
+	1200 3450 1850 3450
+Connection ~ 7600 2650
+Wire Wire Line
+	7900 2650 6200 2650
+Wire Wire Line
+	7900 1850 7900 2650
+Wire Notes Line
+	8200 500  500  500 
+Wire Notes Line
+	8200 500  8200 3000
+Wire Notes Line
+	8200 3000 500  3000
+Wire Wire Line
+	7600 800  7600 1550
+Wire Wire Line
+	6400 2100 6400 2250
+Wire Wire Line
+	6400 2250 6900 2250
+Wire Wire Line
+	6900 2250 6900 1650
+Wire Wire Line
+	6200 2600 6200 2700
+Wire Wire Line
+	4800 2400 5400 2400
+Wire Wire Line
+	5900 2100 6200 2100
+Wire Wire Line
+	5900 1750 5900 2100
+Wire Wire Line
+	6200 2100 6200 2200
+Wire Wire Line
+	800  1650 800  1800
+Wire Wire Line
+	2100 650  2750 650 
+Wire Wire Line
+	2100 650  2100 1350
+Connection ~ 3650 1350
+Wire Wire Line
+	3600 2050 4000 2050
+Wire Wire Line
+	3900 2500 3900 2800
+Wire Wire Line
+	3600 2350 3900 2350
+Wire Wire Line
+	1800 1650 2150 1650
+Wire Wire Line
+	1200 2050 1500 2050
+Wire Wire Line
+	3900 1400 3900 1350
+Wire Wire Line
+	2150 1350 1850 1350
+Wire Wire Line
+	3900 1350 3600 1350
+Wire Wire Line
+	1850 1350 1850 1300
+Wire Wire Line
+	1800 2050 2150 2050
+Wire Wire Line
+	800  2050 800  2200
+Wire Wire Line
+	800  1500 2150 1500
+Wire Wire Line
+	2150 1500 2150 1650
+Wire Wire Line
+	1200 1650 1500 1650
+Wire Wire Line
+	3600 1650 4000 1650
+Connection ~ 2100 1350
+Wire Wire Line
+	2150 2350 1400 2350
+Wire Wire Line
+	3050 650  3650 650 
+Wire Wire Line
+	3650 650  3650 1350
+Wire Notes Line
+	4500 500  4500 4350
+Wire Notes Line
+	500  500  500  4350
+Wire Wire Line
+	6200 1100 5900 1100
+Wire Wire Line
+	5900 1100 5900 1450
+Wire Wire Line
+	5700 2400 5900 2400
+Wire Wire Line
+	6900 1000 6900 1550
+Wire Wire Line
+	6900 1000 6550 1000
+Wire Wire Line
+	6550 1000 6550 1100
+Wire Wire Line
+	6200 750  6200 1100
+Connection ~ 6200 2650
+Wire Wire Line
+	7600 1850 7600 2650
+Wire Wire Line
+	6200 800  7900 800 
+Wire Wire Line
+	7900 800  7900 1550
+Connection ~ 7600 800 
+Wire Wire Line
+	1200 3350 1850 3350
+Wire Wire Line
+	1200 3750 1850 3750
+Connection ~ 6200 800 
+Wire Wire Line
+	3900 2350 3900 2400
+Wire Wire Line
+	2900 3400 3750 3400
+Connection ~ 3300 3400
+Wire Wire Line
+	2900 3500 3750 3500
+Connection ~ 3300 3500
+$Comp
+L CONN_01X02 P4
+U 1 1 576EB876
+P 3950 3900
+F 0 "P4" H 3950 4050 50  0000 C CNN
+F 1 "AC_TERMINAL" V 4050 3900 50  0000 C CNN
+F 2 "1mm-process:CONN2_175" H 3950 3900 50  0001 C CNN
+F 3 "" H 3950 3900 50  0000 C CNN
+	1    3950 3900
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_01X02 P2
+U 1 1 576EB8B7
+P 2950 3900
+F 0 "P2" H 2950 4050 50  0000 C CNN
+F 1 "AC_PIN" V 3050 3900 50  0000 C CNN
+F 2 "1mm-process:SIL-2" H 2950 3900 50  0001 C CNN
+F 3 "" H 2950 3900 50  0000 C CNN
+	1    2950 3900
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	3750 3850 3150 3850
+Wire Wire Line
+	3150 3950 3750 3950
+Wire Wire Line
+	1200 3550 1850 3550
+Text Label 1200 3350 0    60   ~ 0
+VPP
+Text Label 1200 3450 0    60   ~ 0
+VCC
+Text Label 1200 3550 0    60   ~ 0
+GND
+Text Label 1200 3650 0    60   ~ 0
+PGD/TXD
+Text Label 1200 3750 0    60   ~ 0
+PGC/RXD
+Wire Notes Line
+	500  4350 4500 4350
+Text Notes 600  4250 0    60   ~ 0
+Connectors
+$EndSCHEMATC
