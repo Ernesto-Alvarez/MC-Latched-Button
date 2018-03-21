@@ -6,6 +6,11 @@ The button has to be pressed for a preconfigured amount of time (default 5 secon
 
 Module fits a 2 unit DIN circuit breaker box (but does not attach to rails).
 
+Rationale:
+The device was designed for manually controlling part of the basic infrastructure of a house (a water pump). The initial hold time is used to prevent accidental activation of the pump, as a mean of idiot-proofing. The button does not react immediately to prevent accidental or improper activation and the activation can be aborted easily with another button press. The timer value is related to the function of the device being controlled.
+
+All three parameters (the necessary hold time to start the device, the amount of time it operates and the necessary hold time to abort operation) can be configured using the variables hold_tenths, timer_seconds and abort_tenths respectively. The hold times are expressed in 1/10th of a second and the timer in seconds.
+
 Notes:
 1. Timing loop is apparently 107 uS, so the corresponding timing variable should be close to 9345, but it is actually 11111. Realtime code seems to be taking 90uS to run, for reasons unknonwn.
 
