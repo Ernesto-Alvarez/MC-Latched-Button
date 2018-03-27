@@ -38,11 +38,263 @@ void init(void)
 
 void rt_active(uint16_t,uint8_t,uint8_t,uint8_t);
 
+/*Bit-banged serial operations, for a future online configuration function*/
+uint8_t ttl_recv_byte()
+{
+    uint8_t serial_data = 0;
+    
+    //Start bit
+    asm("start_bit:");
+    asm("BTFSC GPIO,0");
+    asm("GOTO start_bit");
+    
+    asm("MOVLW 5");
+    asm("bleed_0:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO bleed_0");
+    
+    asm("NOP");
+    asm("NOP");
+    asm("NOP");
+   
+    //Bit 0
+    asm("BTFSC GPIO,0");    //Time = 26 +-2
+    asm("BSF ttl_recv_byte@serial_data,0");
+    
+    asm("MOVLW 4");
+    asm("bleed_1:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO bleed_1");
+        
+    //Bit 1
+    asm("BTFSC GPIO,0");    //Time = 43 +-2
+    asm("BSF ttl_recv_byte@serial_data,1");
+    
+    asm("MOVLW 4");
+    asm("bleed_2:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO bleed_2");
+    
+    asm("NOP");
+    
+    //Bit 2
+    asm("BTFSC GPIO,0");    //Time = 61 +-2
+    asm("BSF ttl_recv_byte@serial_data,2");
+    
+    asm("MOVLW 4");
+    asm("bleed_3:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO bleed_3");
+    
+    //Bit 3
+    asm("BTFSC GPIO,0");    //Time = 78 +-2
+    asm("BSF ttl_recv_byte@serial_data,3");
+    
+    asm("MOVLW 4");
+    asm("bleed_4:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO bleed_4");
+    
+    //Bit 4
+    asm("BTFSC GPIO,0");    //Time = 95 +-2
+    asm("BSF ttl_recv_byte@serial_data,4");
+    
+    asm("MOVLW 4");
+    asm("bleed_5:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO bleed_5");
+    
+    asm("NOP");
+    
+    //Bit 5
+    asm("BTFSC GPIO,0");    //Time = 113 +-2
+    asm("BSF ttl_recv_byte@serial_data,5");
+    
+    asm("MOVLW 4");
+    asm("bleed_6:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO bleed_6");
+    
+    //Bit 6
+    asm("BTFSC GPIO,0");    //Time = 130 +-2
+    asm("BSF ttl_recv_byte@serial_data,6");
+    
+    asm("MOVLW 4");
+    asm("bleed_7:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO bleed_7");
+    
+    //Bit 7
+    asm("BTFSC GPIO,0");    //Time = 148 +-2
+    asm("BSF ttl_recv_byte@serial_data,7");
+    
+    return (serial_data);
+}
 
-eeprom uint16_t timer_seconds = 720;
-eeprom uint8_t hold_tenths = 50;
+void ttl_send_byte(uint8_t data)
+{
+    //Start bit
+    asm("BCF GPIO,1");
+    
+    asm("MOVLW 2");
+    asm("s_bleed_1:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO s_bleed_1");
+    
+    asm("NOP");
+    asm("NOP");
+    
+    //Bit 0
+    asm("MOVF GPIO,w");
+    asm("ANDLW 0b11111101");
+    asm("RLF ttl_send_byte@data");
+    asm("BTFSC STATUS,0");
+    asm("IORLW 0b00000010");
+    asm("MOVWF GPIO");          //Time = 17
+    
+    asm("MOVLW 3");
+    asm("s_bleed_2:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO s_bleed_2");
+
+    
+    //Bit 1
+    asm("MOVF GPIO,w");
+    asm("ANDLW 0b11111101");
+    asm("RLF ttl_send_byte@data");
+    asm("BTFSC STATUS,0");
+    asm("IORLW 0b00000010");
+    asm("MOVWF GPIO");          //Time = 35
+    
+    asm("MOVLW 2");
+    asm("s_bleed_3:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO s_bleed_3");
+    
+    asm("NOP");
+    asm("NOP");
+    asm("NOP");
+    
+    //Bit 2
+    asm("MOVF GPIO,w");
+    asm("ANDLW 0b11111101");
+    asm("RLF ttl_send_byte@data");
+    asm("BTFSC STATUS,0");
+    asm("IORLW 0b00000010");
+    asm("MOVWF GPIO");          //Time = 52
+    
+    asm("MOVLW 3");
+    asm("s_bleed_4:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO s_bleed_4");
+    
+    //Bit 3
+    asm("MOVF GPIO,w");
+    asm("ANDLW 0b11111101");
+    asm("RLF ttl_send_byte@data");
+    asm("BTFSC STATUS,0");
+    asm("IORLW 0b00000010");
+    asm("MOVWF GPIO");          //Time = 69
+    
+    asm("MOVLW 3");
+    asm("s_bleed_5:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO s_bleed_5");
+    
+    //Bit 4
+    asm("MOVF GPIO,w");
+    asm("ANDLW 0b11111101");
+    asm("RLF ttl_send_byte@data");
+    asm("BTFSC STATUS,0");
+    asm("IORLW 0b00000010");
+    asm("MOVWF GPIO");          //Time = 87
+    
+    asm("MOVLW 2");
+    asm("s_bleed_6:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO s_bleed_6");
+    asm("NOP");
+    asm("NOP");
+    asm("NOP");
+    
+    //Bit 5
+    asm("MOVF GPIO,w");
+    asm("ANDLW 0b11111101");
+    asm("RLF ttl_send_byte@data");
+    asm("BTFSC STATUS,0");
+    asm("IORLW 0b00000010");
+    asm("MOVWF GPIO");          //Time = 104
+    
+    asm("MOVLW 3");
+    asm("s_bleed_7:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO s_bleed_7");
+    
+    //Bit 6
+    asm("MOVF GPIO,w");
+    asm("ANDLW 0b11111101");
+    asm("RLF ttl_send_byte@data");
+    asm("BTFSC STATUS,0");
+    asm("IORLW 0b00000010");
+    asm("MOVWF GPIO");          //Time = 122
+    
+    asm("MOVLW 2");
+    asm("s_bleed_8:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO s_bleed_8");
+    
+    asm("NOP");
+    asm("NOP");
+    asm("NOP");
+    
+    //Bit 7
+    asm("MOVF GPIO,w");
+    asm("ANDLW 0b11111101");
+    asm("RLF ttl_send_byte@data");
+    asm("BTFSC STATUS,0");
+    asm("IORLW 0b00000010");
+    asm("MOVWF GPIO");          //Time = 139
+    
+    asm("MOVLW 4");
+    asm("s_bleed_9:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO s_bleed_9");
+    
+    //Stop Bit
+    asm("BSF GPIO,1");           //Time = 156
+    
+    asm("MOVLW 4");
+    asm("s_bleed_10:");
+    asm("SUBLW 1");
+    asm("BTFSS STATUS,2");
+    asm("GOTO s_bleed_10");
+    
+    asm("NOP");
+    asm("NOP");
+                                //Time = 174
+}
+
+eeprom uint16_t timer_seconds = 15;
+eeprom uint8_t hold_tenths = 25;
 eeprom uint8_t abort_tenths = 5;
-eeprom uint8_t led_persistence_tenths = 3;
+eeprom uint8_t led_persistence_tenths = 1;
 
 void main(void) {
     init();
@@ -54,7 +306,7 @@ void main(void) {
 
 void rt_active(const uint16_t timer_seconds, const uint8_t hold_tenths, const uint8_t abort_tenths, const uint8_t led_persistence_tenths)
 {
-    
+    uint8_t conditionals = 0;
     uint8_t gpio_shadow = 0;
     uint8_t device_status = 0;
     /*  Bit 0 = Button Status
@@ -63,6 +315,8 @@ void rt_active(const uint16_t timer_seconds, const uint8_t hold_tenths, const ui
         Bit 3 = button function
     */
     
+    /*This is the reason for the initial LED blink*/
+    /*Cannot be set to FF because then it will remain on for 64k ticks*/
     uint8_t debounce_sr = 0;       
     
     uint32_t timer_ticks,timer_counter;
@@ -78,7 +332,7 @@ void rt_active(const uint16_t timer_seconds, const uint8_t hold_tenths, const ui
     timer_counter = 0;
     hold_timer = 0;
     
-    /*Full RT function Time: 107 */
+    /*Full RT function Time: 119 */
     asm("start_rt:");
     
     /*  Read GPIO (Time: 2)
@@ -97,12 +351,12 @@ void rt_active(const uint16_t timer_seconds, const uint8_t hold_tenths, const ui
         Out:    debounce_sr
      
 
-        debounce_sr = debounce_sr << 2 + gpio_shadow.button
+        debounce_sr = debounce_sr << 1 + gpio_shadow.button
 
      
     debounce_sr stores the last 8 button presses 
-    FF means that the button has been closed for the last 8 ticks
-    00 means that the button has been open for the last 8 ticks
+    00 means that the button has been closed for the last 8 ticks
+    FF means that the button has been open for the last 8 ticks
     anything else means bouncing is occurring
      */
     
@@ -117,10 +371,15 @@ void rt_active(const uint16_t timer_seconds, const uint8_t hold_tenths, const ui
         Out:    device_status.button
      
      If (debounce_sr == 0)              
-        device_status.button = false;
-     If (debounce_sr == 0xff)
         device_status.button = true;
+     If (debounce_sr == 0xff)
+        device_status.button = false;
     
+     This function inverts the raw value of the GPIO and debouncer
+    
+     * There's a bug in here!
+     * We check the condition, and then we act opposite if NOT happening.
+     * This would mean ACT OPPOSITE DURING BOUNCE!
      */
     
     asm("MOVF rt_active@debounce_sr,f");   
@@ -187,7 +446,7 @@ void rt_active(const uint16_t timer_seconds, const uint8_t hold_tenths, const ui
     asm("BTFSC STATUS,2");                  
     asm("BCF rt_active@gpio_shadow,4");     /*THEN led = off*/
     
-        /*Button off (time: 6)
+        /*Button off (time: 2)
         In:     device_status.button
         Out:    hold_timer, device_status.holding
      
@@ -198,18 +457,23 @@ void rt_active(const uint16_t timer_seconds, const uint8_t hold_tenths, const ui
      }
      
     Clears timers and flags when button is released
+       
+    !!!!!! I think we could skip clearing the hold_timer
+    !!!!!! The timer will keep counting, but since holding is off, and 
+    !!!!!! button press resets the timer, i doesn't matter WHERE it is counting
      */
     
-    asm("BTFSS rt_active@device_status,0");     /*IF button = off*/
-    asm("CLRF rt_active@hold_timer");           /*THEN hold_timer = 0*/
-    asm("BTFSS rt_active@device_status,0");     
-    asm("CLRF rt_active@hold_timer+1");
+//    asm("BTFSS rt_active@device_status,0");     /*IF button = off*/
+//    asm("CLRF rt_active@hold_timer");           /*THEN hold_timer = 0*/
+//    asm("BTFSS rt_active@device_status,0");     
+//    asm("CLRF rt_active@hold_timer+1");
     asm("BTFSS rt_active@device_status,0");     
     asm("BCF rt_active@device_status,2");       /*AND holding = off */
     
-    /* Button push (time: 18)
+    /* Button push (time: 33)
         In:     device_status.button, device_status.holding
         Out: device_status.holding, device_status.function
+        Uses: conditionals
      
      if (button == true && holding == false)
      {
@@ -225,42 +489,53 @@ void rt_active(const uint16_t timer_seconds, const uint8_t hold_tenths, const ui
      proper hold timer for the desired function
      */
     
-    asm("BTFSS rt_active@device_status,0");     /* IF button = true */
-    asm("GOTO push_nop_slide");
-    asm("BTFSC rt_active@device_status,2");
-    asm("GOTO push_nop_slide_2");               /* AND holding = false*/
-    asm("BSF rt_active@device_status,2");       /* THEN holding = true*/
-    asm("BCF rt_active@device_status,3");       /* AND function = !gpio_sh.relay*/
-    asm("BTFSS rt_active@gpio_shadow,5");
-    asm("BSF rt_active@device_status,3");
-    asm("MOVF rt_active@hold_ticks,w");       /* set hold_timer*/
-    asm("BTFSC rt_active@gpio_shadow,5");
-    asm("MOVF rt_active@abort_ticks,w");
-    asm("MOVWF rt_active@hold_timer");
-    asm("MOVF rt_active@hold_ticks+1,w");
-    asm("BTFSC rt_active@gpio_shadow,5");
-    asm("MOVF rt_active@abort_ticks+1,w");
-    asm("MOVWF rt_active@hold_timer+1");
-    asm("GOTO push_end");
+    /*Set conditionals*/
+       
+    asm("CLRF rt_active@conditionals");
+    asm("MOVF rt_active@device_status,w");  /*IF button==True*/
+    asm("ANDLW 13");                        /*AND holding==False*/
+    asm("XORLW 1");                         /*AND function==False*/
+    asm("BTFSC STATUS,2");
+    asm("BSF rt_active@conditionals,0");    
+    asm("XORLW 8");                         /* SAME BUT function == True*/
+    asm("BTFSC STATUS,2");
+    asm("BSF rt_active@conditionals,1");
     
-    asm("push_nop_slide");
-    asm("NOP");
-    asm("NOP");
-    asm("push_nop_slide_2");
-    asm("NOP");
-    asm("NOP");
-    asm("NOP");
-    asm("NOP");
-    asm("NOP");
-    asm("NOP");
-    asm("NOP");
-    asm("NOP");
-    asm("NOP");
-    asm("NOP");
-    asm("NOP");
-    asm("NOP");
-    asm("NOP");
-    asm("push_end:");
+    /*IF BUTTON == True AND HOLDING == False AND FUNCTION == False*/
+    asm("BTFSC rt_active@conditionals,0");
+    asm("BSF rt_active@device_status,2");   /*THEN HOLDING=True*/
+    asm("BTFSC rt_active@conditionals,0");
+    asm("MOVF rt_active@hold_ticks,w");     /*  hold_timer = hold_ticks */
+    asm("BTFSC rt_active@conditionals,0");
+    asm("MOVWF rt_active@hold_timer");
+    asm("BTFSC rt_active@conditionals,0");
+    asm("MOVF rt_active@hold_ticks+1,w");
+    asm("BTFSC rt_active@conditionals,0");
+    asm("MOVWF rt_active@hold_timer+1");
+    asm("BTFSC rt_active@conditionals,0");
+    asm("BSF rt_active@device_status,3");   /*  function = true */
+    
+    
+    /*IF BUTTON == True AND HOLDING == False AND FUNCTION == True*/
+    asm("BTFSC rt_active@conditionals,1");
+    asm("BSF rt_active@device_status,2");   /*THEN HOLDING=True*/
+    asm("BTFSC rt_active@conditionals,1");
+    asm("MOVF rt_active@abort_ticks,w");     /*  hold_timer = abort_ticks */
+    asm("BTFSC rt_active@conditionals,1");
+    asm("MOVWF rt_active@hold_timer");
+    asm("BTFSC rt_active@conditionals,1");
+    asm("MOVF rt_active@abort_ticks+1,w");
+    asm("BTFSC rt_active@conditionals,1");
+    asm("MOVWF rt_active@hold_timer+1");
+    asm("BTFSC rt_active@conditionals,1");
+    asm("BCF rt_active@device_status,3");   /*  function = false */
+       
+    
+    
+    
+    
+    
+    
     
     /* Button hold (time: 25)
         In:     device_status.holding, hold_timer, device_status.function
