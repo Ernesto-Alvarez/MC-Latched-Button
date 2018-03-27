@@ -291,9 +291,9 @@ void ttl_send_byte(uint8_t data)
                                 //Time = 174
 }
 
-eeprom uint16_t timer_seconds = 15;
-eeprom uint8_t hold_tenths = 25;
-eeprom uint8_t abort_tenths = 5;
+eeprom uint16_t timer_seconds = 720;
+eeprom uint8_t hold_tenths = 50;
+eeprom uint8_t abort_tenths = 2;
 eeprom uint8_t led_persistence_tenths = 1;
 
 void main(void) {
@@ -345,52 +345,19 @@ void rt_active(const uint16_t timer_seconds, const uint8_t hold_tenths, const ui
     asm("MOVF GPIO,w");
     asm("MOVWF rt_active@gpio_shadow");
     
-    
-    /*  Debouncer (time: 4)
-        In:     gpio_shadow
-        Out:    debounce_sr
-     
-
-        debounce_sr = debounce_sr << 1 + gpio_shadow.button
-
-     
-    debounce_sr stores the last 8 button presses 
-    00 means that the button has been closed for the last 8 ticks
-    FF means that the button has been open for the last 8 ticks
-    anything else means bouncing is occurring
+ 
+    /*Button input (time: 3)
+     In: GPIO_shadow
+     Out: device_status
+     Inverts the status of the hardware button, causing device_status.button to
+     be 1 when the button is pressed and 0 when is not
+     We got rid of the broken debouncer replacing it with nothing. Debouncing
+     is not a problem with the hold timers, as that works as a debouncer as well.
      */
     
-    asm("RLF rt_active@debounce_sr");
-    asm("BSF rt_active@debounce_sr,0");
+    asm("BCF rt_active@device_status,0");    
     asm("BTFSS rt_active@gpio_shadow,2");
-    asm("BCF rt_active@debounce_sr,0");
-
-    
-    /*  Button input (time: 6)
-        In:     debounce_sr
-        Out:    device_status.button
-     
-     If (debounce_sr == 0)              
-        device_status.button = true;
-     If (debounce_sr == 0xff)
-        device_status.button = false;
-    
-     This function inverts the raw value of the GPIO and debouncer
-    
-     * There's a bug in here!
-     * We check the condition, and then we act opposite if NOT happening.
-     * This would mean ACT OPPOSITE DURING BOUNCE!
-     */
-    
-    asm("MOVF rt_active@debounce_sr,f");   
-    asm("BTFSS STATUS,2");                  /*STATUS.2 = ALU ZERO FLAG*/
-    asm("BCF rt_active@device_status,0");  
-    asm("INCF rt_active@debounce_sr,w");   
-    asm("BTFSS STATUS,2");
-    asm("BSF rt_active@device_status,0");  
-    
-    
-    
+    asm("BSF rt_active@device_status,0"); 
     
     /*  LED Set Timer (time: 10)
         In:     device_status.button, led_ticks
