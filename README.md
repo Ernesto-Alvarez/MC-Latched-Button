@@ -5,3 +5,5 @@ The device uses a microcontroller to control a relay that can be connected to th
 The button has to be pressed for a preconfigured amount of time (default 5 seconds) and keeps the relay closed for another configurable time (default 12 minutes). Device can be shutdown by pressing the button for a configurable amount of time (default: short press, 0.2 seconds).
 
 Module fits a 2 unit DIN circuit breaker box (but does not attach to rails).
+
+See branch v1 for what works today (not perfectly, but good enough) and branch v2 for what will work in the future (hopefully, perfectly).
