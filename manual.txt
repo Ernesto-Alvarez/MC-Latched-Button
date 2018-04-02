@@ -1,0 +1,60 @@
+Latched button implementer's manual
+
+1. System description
+
+1.1. Textual description
+
+This is version 2 of the project https://github.com/Ernesto-Alvarez/MC-Latched-Button.
+
+The device uses a microcontroller to control a relay that can be connected to the power supply of mains powered devices. The button has to be pressed for a preconfigured amount of time (default 5 seconds) and keeps the relay closed for another configurable time (default 12 minutes). Device can be shutdown by pressing the button for a configurable amount of time (default: short press, 0.2 seconds).
+
+The microcontroller (a pic 12F629) runs realtime code in a loop to allow a possible future upgrade that would allow serial communications on pins GP0 and GP1. The code would have to bit bang the protocol, so strict timing is necessary. Pin GP2 is connected to a button and pull-up. Pin GP4 is connected to a LED, used to acknowledge button pushes and GP5 is connected both to a relay (used for operating the controlled device) and a LED. This LED will turn on if and only if the relay is energized.
+
+1.2. State diagrams
+
+The device's state can be represented by two state machines. One machine defines the acknowledgement LED state while the other defines the relay's state.
+
+1.2.1. LED State machine
+
+1.2.1.1 Graph form 
+
+          							                                                    /----------------------Button press event-----------\
+									                                                         v	    			                                         |
+
++---------+                 			                    	 +-------------------+					                                +-------------+
+| LED off | ----------Button press event---------------> | Button Pressed    | ----------Button release event--------> 	| Persistence |
+|(state 0)|						                                   | (state 2)	       |					                                |  (state 1)  |
++---------+                                              +-------------------+                                          +-------------+
+      ^										                      	      			     
+       \----------------------------------------------------LED Timer expiration----------------------------------------------------/
+
+
+1.2.1.2 State descriptions
+
+There are 3 states: LED off, Button pressed and Presistence. The state numbers are created based on the states of different components of the device. See the tabular form for details on the representations. The numbers may be changed with a new implementation.
+
+LED off represents the quiescent state of the device: the button has not been pressed and the timer is not running. The LED is off, waiting for a button press. A button press triggers the event that sets the state to 2 (button pressed).
+
+Button pressed represents the state where the button has been pressed and has not yet been released (or is being released in this iteration). The button is on, the timer is not running and the LED is on. In each iteration in this state, the button is sensed. Detecting a button release in this state triggers the button release event, which changes state to 1 (persistence) and sets the persistence timer to the appropriate value, as defined in the program configuration EEPROM. Keeping the button pressed has the effect of remaining in this state.
+
+In the Presistence state the timer counts down to 0, once per iteration of the real time loop, the LED is on, but the button is not pressed. There are two possible transitions from this state: the timer can expire or the button can be pressed again. If the timer expires, the device transitions to state 0 (LED off), the LED is turned off and the device goes to its quiescent state. If the button is pressed while in this state, the device returns to state 2 (Button pressed), which will eventually lead back to this state, counting anew.
+
+1.2.1.3 Tabular representation
+
+		      	      LSB			            MSB			                	LED state	State number
+LED Off		      	Timer = 0 (off)		  Button = 0 (not pressed)	Off   		0
+Persistence		    Timer = 1 (running)	Button = 0 (not pressed)	On		    1
+Button pressed		Timer = 0 (off)		  Button = 1 (pressed)		  On	      2
+
+The LED state is not represented as bits in the state as its value is derived from the timer and button, using the formula below.
+
+LED = Button OR Timer
+
+
+1.2.2. Relay state machine
+
+ 
+
+2. Hardware
+
+3. Software
