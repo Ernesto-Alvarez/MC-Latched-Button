@@ -100,7 +100,7 @@ The On state represents the usual mode of operation when the device is active. T
 
 The Aborting state is the analog of the Starting state, but for shutdowns. The button is pressed, the abort timer is counting but the relay (and its timer) is running as well. Unlike its analog, there are 3 possible transitions. If the button is released, the device goes to the On state and the shutdown is canceled. If the abort timer expires, the device goes to the Aborted state. Unlike the Starting state, this state has a third possibility: the relay timer could expire while the abort timer is running (which could happen if aborting when the relay timer is about to expire). In that case, the device goes to the FWA state.
 
-The Aborted state is analogous to the Started state, but simpler. In thois state, the device waits for the button release to transition to the Off state. No timers are running, the relay is off and there is no other possible transition than waiting for a button release and shutting off.
+The Aborted state is analogous to the Started state, but simpler. In this state, the device waits for the button release to transition to the Off state. No timers are running, the relay is off and there is no other possible transition than waiting for a button release and shutting off.
 
 The FWA (finished while aborting) state is a special case, which happens if the button is pressed close to the end of the activation cycle (e.g. when aborting a cycle that is about to end). In this case, the relay timer is turned off but the abort timer is kept on. Should the button be released, the device will immediately go to the Off state. If the button is kept pressed long enough to allow the abort timer to expire, the device will go to the aborted state. In both cases, the device recovers from what could be a race condition.
 
@@ -122,4 +122,132 @@ The relay is energized if and only if the Relay Timer is running (on).
 
 2. Hardware
 
+Version 2 hardware will be compatible with v1 hardware. The v2 firmware prototype is currently being tested on v1 hardware, and no major improvements to the hardware are expected, except for better structural support.
+
 3. Software
+
+3.1. General description
+
+The software runs in a tight loop of a specified length of time, thus ensuring a strict and well known relationship between loop iterations and time elapsed. This loop should be programmed in such a way that it will take a round number of microseconds (e.g. 250 uS) to minimize numerical and rounding errors when converting from seconds (or tenths) to loop iterations (ticks).
+
+The strict timing needed for the loop requires assembly language to be used for programming the loop. Moreover, the code must run in a constant amount of time irrespective to system state and any conditionals that might be taken. The timing of all used instructions must be known and no optimizations must be used. To simplify timing calculations, only instructions that take 1 cycle will be used. This means leaving out CALL, GOTO and the RETURN instructions, which take 2 cycles and cause the execution flow to change. Conditional execution can be used and will be the main method for implementing conditionals.
+
+The program can (and will) be logically divided into functions, but they will have to be manually inlined into a single realtime function (rt_loop). C inlines cannot be used because the freeware version of XC8 cannot use inlining and because inlining is a recommendation to the compiler, but its implementation is not mandatory when requested. Effectively, the realtime loop will be written in assembly language, leaving setup and non critical sections in C.
+
+3.2. Programming techniques
+
+3.2.1 Conditionals
+
+Conditionals should not be implemented using traditional means, as the use of GOTO would change the execution flow, requiring extensive checks to ensure that every possible combination of branches taken are executed in the same amount of time, possibly requiring extensive use of manually calibrated NOP slides, which is error prone.
+
+Instead, conditional clauses can be precalculated in each function, stored and then used in conditional execution commands. These commands are declared in the PIC midrange architecture manual as taking the same amount of time whether the condition is true or not (substituting for the proper amount of NOPs, if false) to ensure they take the same amount of time. Moreover, since all instructions used (except for conditionals) take 1 cycle, we can further ensure that each conditional evaluation plus its conditional instruction in the next address will take exactly 2 cycles.
+
+While simple conditions can be tested by using the BTFSC and BTFSS instructions, more complex conditions (having several ANDed clauses) must be precomputed and its result stored in a bit field. For that purpose we define a conditionals variable.
+
+As an example of this precalculation of conditionals, we show the code for decrementing the LED timer, which is a 16 bit variable.
+
+    CLRF rt_loop@conditionals
+
+    /*Check for state 1 (conditional bit 0)*/
+    MOVLW 1
+    XORWF rt_loop@led_state,w
+    BTFSC STATUS,2
+    BSF rt_loop@conditionals,0
+    
+    /*State 1 AND byte 1 = 0 (conditional bit 1)*/
+    IORWF rt_loop@led_timer,w
+    BTFSC STATUS,2
+    BSF rt_loop@conditionals,1
+
+    /*Decrement timer*/
+    BTFSC rt_loop@conditionals,0
+    DECF rt_loop@led_timer
+    BTFSC rt_loop@conditionals,1
+    DECF rt_loop@led_timer+1
+
+The timer needs to be decremented ONLY if its state flag is set, else it should be left alone. Moreover, being a 16 bit value, its MSB should ONLY be decremented if the LSB is zero. This decrement must not take place if the LSB is not going to be decremented, even if it is 0, as doing so would decrement the MSB once per each tick when in the inactive state, provided its LSB is 0. Therefore, the pseudo code for the timer code would like the one shown below.
+
+    IF led_state requires decrementing timer
+        THEN
+        Decrement LSB
+        IF LSB was 0
+            THEN
+            Decrement MSB
+        FI
+    FI
+
+This can be rewritten in the form shown below.
+
+    IF led_state requires decrementing timer
+        THEN
+        Decrement LSB
+    FI
+    IF led_state requires decrementing timer AND LSB was 0 before decrement
+        THEN
+        Decrement MSB
+    FI
+
+Note that in either case we have a double conditional or two clauses for the MSB, which we cannot directly use the BTFSx instructions. Instead, we precalculate the conditions for the LSB and the MSB.
+
+The first assembly language block calculates whether the device state requires the timer to decrement or not. We do this by comparing the state and a test value by XORing them and testing for the ZERO flag. Lacking any conditionals until the final check, we know that the calculation will take 5 cycles to complete. This deposits the result in bit 0 of the conditional bit field.
+
+The second block determines both if the state is right and if the LSB is zero, by reusing the result from the last conditional and doing an inclusive OR with the calculation result for the LSB = 0 check (in this case, the LSB itself is ORed). Note that reusing the result is just an optimization and it would be perfectly reasonable to test the result of an earlier calculation directly from the conditional bitfield, allowing the use of formely calculated conditions in a multi-step calculation. 
+
+Finally, as each possible combination of conditions has been stored in the bitfield, it is perfectly possible to use the BTFSx instructions on each assembly instruction, changing the condition bit in response to the different nesting levels or conditional clauses, at a 100% penalty but ensuring constant time execution.
+
+OR conditions can be synthesized in a similar way, by computing each condition and then setting the conditional bit on any or by ORing conditional bits (instead of ANDing them). An example of this can be seen in the code that recovers from invalid states.
+
+    CLRF rt_loop@conditionals
+
+    /*Check for undefined states*/
+    MOVF rt_loop@led_state,w
+    ANDLW 248
+    BTFSS STATUS,2
+    BSF rt_loop@conditionals,0
+    
+    /*Check for state 3*/
+    MOVF rt_loop@led_state,w
+    ANDLW 3
+    XORLW 3
+    BTFSC STATUS,2
+    BSF rt_loop@conditionals,0
+    
+    /*Recovery code, use conditional bit 0*/
+    BTFSC rt_loop@conditionals,0
+    CLRF rt_loop@led_state
+
+In the code above, the state value is first masked and tested to see if there are reserved bits set. If that is the case, conditional bit 0 is set. Then, the state is checked for a specific state (state 3 which is not valid). If that is the case, the same bit is set. 
+
+The end result is that if any of the clauses is true, the bit will be set, effectively creating an OR condition. Finally, the recovery code will be executed if the bit is set, meaning that at least one clause was true. Note that the calculations are not reused in this example.
+
+3.2.2 Multi byte decrementing
+
+Recall the timer code in section 3.2.1. The code first checks for the device state to determine whether the timer should be decremented or not, putting the result of this check in bit 0 of the conditional bitfield. Then, the next condition to be checked is both the state check and to check whether the LSB is zero or not.
+
+This can be extended for arbitrary counter sizes. By successively ORing each counter byte, starting from the LSB and ending at the second most significant one (storing each result in a separate conditional bit), the timer can be of any size, with the conditional bitfield limiting its size.
+
+This works because the n-th byte has to be decremented only when all lower bytes are all zero. By testing and successively ORing each byte from the LSB, we can ensure that the decrement condition is made false (and unable to turn true once it has been made false) if any of the lower bytes is not 0 OR if the counter should not be decremented (that being the condition for decrementing the LSB). Each byte decrement operation can be conditioned by the bits in the bitfield, decrementing the n-th byte only if the n-th conditional bit is set. It is clear that this bitfield will have the form of zero or more 1 bits in the least significant positions followed by enough 0 bits in the most significant positions. While stating the number of 1 bits in the field (effectively meaning the number of bytes to decrement) would be a more efficient use of storage capacity, it would require more complex conditional calculations and checks. The memory versus execution time tradeoff is considered good enough to warrant the use of a bitfield.
+
+3.2.3 GPIO Shadow
+
+The realtime functions uses a GPIO shadow variable. This ensures that the inputs remain static during each loop (changing only after a full loop is complete) and also ensuring that outputs will only be committed to the wire once for every loop iteration.
+
+The first condition prevents some race conditions from happening, since the inputs won't change in mid-loop and there won't be a risk of execution of multiple unexpected state change functions in response to bouncing or activation of the button in mid-loop. By shadowing the GPIO, we can simplify the inlined blocks and also select the priorities of the inputs based on the block position in the loop.
+
+The second effect prevents unwanted oscillation of outputs in response to temporary adjustments of the output variables as part of condition testing. A block can have the following form without adverse effects.
+
+    BSF output
+    BTFSS conditional_bit,bit#
+    BCF output
+
+This code, if the output were the GPIO register itself, would cause the output to be raised for 1 uS only to be lowered, should the condition be false. Additionally, the output would stabilize at different times depending on the condition. Finally, if multiple outputs were to be set in this manner, they would not be set simultaneously.
+
+By using a shadow variable, we can ensure that outputs will be updated at a specific time in the loop, once per tick and simultaneously.
+
+3.2.4. State changes
+
+The state change functions should have the same form: a conditional evaluation followed by execution conditioned by the conditional bitfield. The conditional evaluation will usually take the form of a series of bit operations involving the device state and relevant inputs, committing the results to the conditional bitfield. The state change code will usually be a series of instructions all conditioned on the same bitfield, as a state change should be an all-or-nothing operation.
+
+In the case of timer expiration, the condition will be a check on whether its value is zero, and the change code simply clears the relevant state bit. This allows the graceful handling of multiple timers independently and (with proper state planning) nullifying the effect of race conditions. 
+By putting button related state changes before timer related ones, the button can be given precedence over timer related transitions. Note that timer decrement code  is not a state change operation, and these blocks should go before the code related to state changes.
+
