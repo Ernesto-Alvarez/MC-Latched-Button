@@ -74,15 +74,20 @@ void rt_loop(const uint16_t timer_seconds, const uint8_t hold_tenths, const uint
     uint16_t abort_ticks = 0;
     uint16_t abort_timer = 0;
     
-    led_ticks = led_persistence_tenths * 1 + 1;
-    relay_ticks = timer_seconds * 1 + 1;
-    hold_ticks = hold_tenths * 1 + 1;
-    abort_ticks = abort_tenths * 1 + 1;
+    /*loop calibration
+     1 loop is executed in 250uS
+     4000 loops pass in 1 second, 400 in 1/10 second*/
+    led_ticks = led_persistence_tenths * 400 + 1;
+    relay_ticks = timer_seconds * 4000 + 1;
+    hold_ticks = hold_tenths * 400 + 1;
+    abort_ticks = abort_tenths * 400 + 1;
     
-    /* Full RT loop. Time: 280*/
+    /* Full RT loop. Time: 249 + 1 NOP*/
     asm("start_rt:");
     
-       
+    /*NOP: waste enough time to use 250 instructions per loop (time: 1)*/   
+    asm("NOP");
+    
     /*  Read GPIO (Time: 2)
         In:     GPIO
         Out:    gpio_shadow
@@ -189,7 +194,7 @@ void rt_loop(const uint16_t timer_seconds, const uint8_t hold_tenths, const uint
     
     /* Timers and in-state changes*/
     
-    /* Timer decrement/LED (time: 12)
+    /* Timer decrement/LED (time: 17)
      If timer is on (LED state 1), decrement timer.
      */
     
@@ -537,13 +542,11 @@ void rt_loop(const uint16_t timer_seconds, const uint8_t hold_tenths, const uint
     asm("BTFSC STATUS,2");
     asm("BCF rt_loop@gpio_shadow,4");
     
-    /*Activate/deactivate Relay (time: 5)
+    /*Activate/deactivate Relay (time: 3)
      Matches relay timer bit */
     
     asm("BSF rt_loop@gpio_shadow,5");
-    asm("MOVF rt_loop@relay_state,w");
-    asm("ANDLW 1");
-    asm("BTFSC STATUS,2");
+    asm("BTFSS rt_loop@relay_state,0");
     asm("BCF rt_loop@gpio_shadow,5");
     
     /*Commit shadow GPIO to real (time: 2)*/
